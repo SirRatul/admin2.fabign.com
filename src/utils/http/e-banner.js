@@ -26,8 +26,6 @@ const Update = async (data, id) => {
 const Store = async (data) => {
   const config = {
     headers: {
-      "Content-Type": "application/json",
-      Accept: "application/json",
       Authorization: `Bearer ${localStorage.getItem("token")}`,
     },
   };
