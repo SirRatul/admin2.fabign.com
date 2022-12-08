@@ -73,7 +73,7 @@ const MenuItems = (props) => {
                         exact={item.exact ? item.exact : false}
                         children={item.children}
                       />
-                    ) : null
+                    ) : null,
                   )}
               </div>
             </div>
@@ -107,8 +107,8 @@ export const Layout = (props) => {
         <div
           className={show ? "sidebar shadow open-sidebar" : "sidebar shadow"}
         >
-          <div className="logo py-1">
-            <Image src={Images.Logo} alt="Fabign Logo" x={300} y={60} />
+          <div className="logo py-1 text-center bg-light">
+            <Image className="w-50" src={Images.Logo} alt="Fabign Logo" />
           </div>
           <div className="main-menu-bar">
             <div className="text-center pb-3">
