@@ -4,6 +4,7 @@ import NetworkError from "../assets/501.png";
 import NoContent from "../assets/204.png";
 import Person from "../assets/person.png";
 import Logo from "../assets/logo.png";
+import Paid from "../assets/paid.png";
 
 export const Images = {
   // Logo,
@@ -12,4 +13,5 @@ export const Images = {
   NoContent,
   Person,
   Logo,
+  Paid,
 };

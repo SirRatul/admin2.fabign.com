@@ -18,6 +18,7 @@ import { Loader } from "../loading";
 import { CustomError } from "../../utils/error";
 import { Text } from "../text";
 import { Card } from "../card";
+import Invoice from "../invoice";
 import { Requests } from "../../utils/http";
 import { CheckboxDropdown } from "../checkboxDropdown";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -26,9 +27,12 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
+import html2canvas from "html2canvas";
+import moment from "moment";
 
 const AllOrder = forwardRef((props, ref) => {
   const tableRef = useRef(null);
+  const [selectedRow, setSelectedRow] = useState();
   const [data, setData] = useState([]);
   const [searchableData, setSearchableData] = useState([]);
   const [allData, setAllData] = useState([]);
@@ -83,7 +87,7 @@ const AllOrder = forwardRef((props, ref) => {
               dateYearFormat(document.getElementById("endDate").value),
               document.getElementById("search").value,
               page,
-              limit
+              limit,
             );
           if (response && response.data && response.data.body) {
             setData(response.data.body.order);
@@ -94,7 +98,7 @@ const AllOrder = forwardRef((props, ref) => {
                 response.data.body.pendingOrder,
                 response.data.body.deliveryOrder,
                 response.data.body.cancelledOrder,
-                response.data.body.confirmedOrder
+                response.data.body.confirmedOrder,
               );
             }
           }
@@ -102,7 +106,7 @@ const AllOrder = forwardRef((props, ref) => {
             await Requests.EOrder.AllFilterByFromToDateWithSearch(
               dateYearFormat(document.getElementById("startDate").value),
               dateYearFormat(document.getElementById("endDate").value),
-              document.getElementById("search").value
+              document.getElementById("search").value,
             );
           if (
             searchResponse &&
@@ -121,7 +125,7 @@ const AllOrder = forwardRef((props, ref) => {
             dateYearFormat(document.getElementById("startDate").value),
             dateYearFormat(document.getElementById("endDate").value),
             page,
-            limit
+            limit,
           );
           if (response && response.data && response.data.body) {
             setData(response.data.body.order);
@@ -132,13 +136,13 @@ const AllOrder = forwardRef((props, ref) => {
                 response.data.body.pendingOrder,
                 response.data.body.deliveryOrder,
                 response.data.body.cancelledOrder,
-                response.data.body.confirmedOrder
+                response.data.body.confirmedOrder,
               );
             }
           }
           const searchResponse = await Requests.EOrder.AllFilterByFromToDate(
             dateYearFormat(document.getElementById("startDate").value),
-            dateYearFormat(document.getElementById("endDate").value)
+            dateYearFormat(document.getElementById("endDate").value),
           );
           if (
             searchResponse &&
@@ -160,7 +164,7 @@ const AllOrder = forwardRef((props, ref) => {
                 response.data.body.pendingOrder,
                 response.data.body.deliveryOrder,
                 response.data.body.cancelledOrder,
-                response.data.body.confirmedOrder
+                response.data.body.confirmedOrder,
               );
             }
           }
@@ -196,7 +200,7 @@ const AllOrder = forwardRef((props, ref) => {
         }
       }
     },
-    [currentPage, limit, props.report]
+    [currentPage, limit, props.report],
   );
 
   useEffect(() => {
@@ -221,7 +225,7 @@ const AllOrder = forwardRef((props, ref) => {
         dateYearFormat(document.getElementById("endDate").value),
         document.getElementById("search").value,
         page,
-        newPerPage
+        newPerPage,
       );
       setData(response.data.body.order);
       setLimit(newPerPage);
@@ -229,7 +233,7 @@ const AllOrder = forwardRef((props, ref) => {
         await Requests.EOrder.AllFilterByFromToDateWithSearch(
           dateYearFormat(document.getElementById("startDate").value),
           dateYearFormat(document.getElementById("endDate").value),
-          document.getElementById("search").value
+          document.getElementById("search").value,
         );
       if (searchResponse && searchResponse.data && searchResponse.data.body) {
         setSearchableData(searchResponse.data.body.order);
@@ -244,13 +248,13 @@ const AllOrder = forwardRef((props, ref) => {
         dateYearFormat(document.getElementById("startDate").value),
         dateYearFormat(document.getElementById("endDate").value),
         page,
-        newPerPage
+        newPerPage,
       );
       setData(response.data.body.order);
       setLimit(newPerPage);
       const searchResponse = await Requests.EOrder.AllFilterByFromToDate(
         dateYearFormat(document.getElementById("startDate").value),
-        dateYearFormat(document.getElementById("endDate").value)
+        dateYearFormat(document.getElementById("endDate").value),
       );
       if (searchResponse && searchResponse.data && searchResponse.data.body) {
         setSearchableData(searchResponse.data.body.order);
@@ -282,7 +286,7 @@ const AllOrder = forwardRef((props, ref) => {
           dateYearFormat(document.getElementById("endDate").value),
           data,
           1,
-          limit
+          limit,
         );
         if (response && response.data && response.data.body) {
           setData(response.data.body.order);
@@ -293,7 +297,7 @@ const AllOrder = forwardRef((props, ref) => {
               response.data.body.pendingOrder,
               response.data.body.deliveryOrder,
               response.data.body.cancelledOrder,
-              response.data.body.confirmedOrder
+              response.data.body.confirmedOrder,
             );
           }
         }
@@ -301,7 +305,7 @@ const AllOrder = forwardRef((props, ref) => {
           await Requests.EOrder.AllFilterByFromToDateWithSearch(
             dateYearFormat(document.getElementById("startDate").value),
             dateYearFormat(document.getElementById("endDate").value),
-            document.getElementById("search").value
+            document.getElementById("search").value,
           );
         if (searchResponse && searchResponse.data && searchResponse.data.body) {
           setSearchableData(searchResponse.data.body.order);
@@ -319,7 +323,7 @@ const AllOrder = forwardRef((props, ref) => {
               response.data.body.pendingOrder,
               response.data.body.deliveryOrder,
               response.data.body.cancelledOrder,
-              response.data.body.confirmedOrder
+              response.data.body.confirmedOrder,
             );
           }
         }
@@ -383,7 +387,7 @@ const AllOrder = forwardRef((props, ref) => {
               dateYearFormat(data),
               document.getElementById("search").value,
               1,
-              limit
+              limit,
             );
           if (response && response.status && response.status === 200) {
             setData(response.data.body.order);
@@ -394,7 +398,7 @@ const AllOrder = forwardRef((props, ref) => {
                 response.data.body.pendingOrder,
                 response.data.body.deliveryOrder,
                 response.data.body.cancelledOrder,
-                response.data.body.confirmedOrder
+                response.data.body.confirmedOrder,
               );
             }
           }
@@ -402,7 +406,7 @@ const AllOrder = forwardRef((props, ref) => {
             await Requests.EOrder.AllFilterByFromToDateWithSearch(
               dateYearFormat(document.getElementById("startDate").value),
               dateYearFormat(document.getElementById("endDate").value),
-              document.getElementById("search").value
+              document.getElementById("search").value,
             );
           if (
             searchResponse &&
@@ -425,7 +429,7 @@ const AllOrder = forwardRef((props, ref) => {
               dateYearFormat(data),
               dateYearFormat(toDate),
               1,
-              limit
+              limit,
             );
             if (response && response.status && response.status === 200) {
               setData(response.data.body.order);
@@ -436,7 +440,7 @@ const AllOrder = forwardRef((props, ref) => {
             }
             const searchResponse = await Requests.EOrder.AllFilterByFromToDate(
               dateYearFormat(document.getElementById("startDate").value),
-              dateYearFormat(document.getElementById("endDate").value)
+              dateYearFormat(document.getElementById("endDate").value),
             );
             if (
               searchResponse &&
@@ -472,7 +476,7 @@ const AllOrder = forwardRef((props, ref) => {
               dateYearFormat(data),
               document.getElementById("search").value,
               1,
-              limit
+              limit,
             );
           if (response && response.status && response.status === 200) {
             setData(response.data.body.order);
@@ -483,7 +487,7 @@ const AllOrder = forwardRef((props, ref) => {
                 response.data.body.pendingOrder,
                 response.data.body.deliveryOrder,
                 response.data.body.cancelledOrder,
-                response.data.body.confirmedOrder
+                response.data.body.confirmedOrder,
               );
             }
           }
@@ -491,7 +495,7 @@ const AllOrder = forwardRef((props, ref) => {
             await Requests.EOrder.AllFilterByFromToDateWithSearch(
               dateYearFormat(document.getElementById("startDate").value),
               dateYearFormat(document.getElementById("endDate").value),
-              document.getElementById("search").value
+              document.getElementById("search").value,
             );
           if (
             searchResponse &&
@@ -514,7 +518,7 @@ const AllOrder = forwardRef((props, ref) => {
               dateYearFormat(date),
               dateYearFormat(data),
               1,
-              limit
+              limit,
             );
             if (response && response.status && response.status === 200) {
               setData(response.data.body.order);
@@ -525,13 +529,13 @@ const AllOrder = forwardRef((props, ref) => {
                   response.data.body.pendingOrder,
                   response.data.body.deliveryOrder,
                   response.data.body.cancelledOrder,
-                  response.data.body.confirmedOrder
+                  response.data.body.confirmedOrder,
                 );
               }
             }
             const searchResponse = await Requests.EOrder.AllFilterByFromToDate(
               dateYearFormat(document.getElementById("startDate").value),
-              dateYearFormat(document.getElementById("endDate").value)
+              dateYearFormat(document.getElementById("endDate").value),
             );
             if (
               searchResponse &&
@@ -748,6 +752,21 @@ const AllOrder = forwardRef((props, ref) => {
     saveAs(blob, "fileName" + fileExtension);
   };
 
+  const exportPDF = () => {
+    document.getElementById("test").classList.remove("d-none");
+    html2canvas(document.getElementById("test"), {
+      useCORS: true,
+      crossOrigin: "anonymous",
+    }).then((canvas) => {
+      const object = canvas.toDataURL("image/png");
+      const doc = new jsPDF("p", "pt", [1300, 840], 60, 60);
+      doc.addImage(object, "png", 10, 10);
+      doc.save("sample-file.pdf");
+      setLoading(false);
+    });
+    document.getElementById("test").classList.add("d-none");
+  };
+
   // const exportPDF = () => {
   //   let element = document.getElementsByClassName("sc-fLlhyt ifOHjV")[0];
   //   console.log(element);
@@ -897,7 +916,15 @@ const AllOrder = forwardRef((props, ref) => {
           <GrayButton
             type="button"
             className="btn-circle ms-2 mt-2 mt-sm-0"
-            onClick={() => console.log("Will print")}
+            onClick={() => {
+              setTimeout(() => {
+                setLoading(true);
+                setSelectedRow(row);
+              }, 200);
+              setTimeout(() => {
+                exportPDF();
+              }, 500);
+            }}
           >
             <Printer size={18} />
           </GrayButton>
@@ -1086,6 +1113,7 @@ const AllOrder = forwardRef((props, ref) => {
           </Card.Body>
         </Card.Simple>
       </Container.Column>
+      {selectedRow && <Invoice item={selectedRow} />}
     </div>
   );
 });

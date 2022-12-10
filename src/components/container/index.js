@@ -6,6 +6,7 @@ const Basic = (props) => {
   return (
     <div
       className={props.className ? props.className + " container" : "container"}
+      id={props.id && props.id}
     >
       {props.children}
     </div>
